@@ -1,0 +1,15 @@
+src: data/src/
+tgt: data/FSDnoisy18k.audio_test/82929.wav
+output: output.wav
+model: music2latent       # or "encodec"
+grain_size: 0.2           # seconds
+temperature: 0.01
+threshold: 1.0
+stride_factor: 1.0       # stride = unit * stride_factor
+
+encodec:
+  sample_rate: 24000
+  bandwidth: 6.0
+
+music2latent:
+  sample_rate: 44100

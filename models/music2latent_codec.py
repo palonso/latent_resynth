@@ -1,0 +1,31 @@
+import numpy as np
+import torch
+from music2latent import EncoderDecoder
+
+from . import get_device
+
+
+class Music2LatentCodec:
+    def __init__(self, cfg):
+        self._device = get_device()
+        self._encdec = EncoderDecoder(device=self._device)
+        self._sample_rate = cfg.music2latent.sample_rate
+
+    @property
+    def sample_rate(self) -> int:
+        return self._sample_rate
+
+    @property
+    def frame_rate(self) -> float:
+        # music2latent produces ~10 Hz latent frames (1 frame per ~100ms)
+        return self._sample_rate / 4410
+
+    def encode(self, audio: np.ndarray) -> torch.Tensor:
+        latent = self._encdec.encode(audio)
+        # squeeze batch dim → [latent_dim, seq_len]
+        return latent.squeeze(0)
+
+    def decode(self, latent: torch.Tensor) -> np.ndarray:
+        # add batch dim → [1, latent_dim, seq_len]
+        audio = self._encdec.decode(latent.unsqueeze(0))
+        return audio.squeeze().cpu().numpy()

@@ -1,0 +1,16 @@
+[project]
+name = "latent-resynth"
+version = "0.1.0"
+description = "Latent granular resynthesis CLI tool"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "torch",
+    "torchaudio",
+    "music2latent",
+    "encodec",
+    "hydra-core",
+    "scipy",
+    "numpy",
+    "librosa",
+    "soundfile",
+]
