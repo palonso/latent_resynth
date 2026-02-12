@@ -10,6 +10,7 @@ class Music2LatentCodec:
         self._device = get_device()
         self._encdec = EncoderDecoder(device=self._device)
         self._sample_rate = cfg.music2latent.sample_rate
+        self._max_batch_size = cfg.music2latent.max_batch_size
 
     @property
     def sample_rate(self) -> int:
@@ -21,11 +22,11 @@ class Music2LatentCodec:
         return self._sample_rate / 4410
 
     def encode(self, audio: np.ndarray) -> torch.Tensor:
-        latent = self._encdec.encode(audio)
+        latent = self._encdec.encode(audio, max_batch_size=self._max_batch_size)
         # squeeze batch dim → [latent_dim, seq_len]
         return latent.squeeze(0)
 
     def decode(self, latent: torch.Tensor) -> np.ndarray:
         # add batch dim → [1, latent_dim, seq_len]
-        audio = self._encdec.decode(latent.unsqueeze(0))
+        audio = self._encdec.decode(latent.unsqueeze(0), max_batch_size=self._max_batch_size)
         return audio.squeeze().cpu().numpy()

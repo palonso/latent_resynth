@@ -13,3 +13,4 @@ encodec:
 
 music2latent:
   sample_rate: 44100
+  max_batch_size: 1
