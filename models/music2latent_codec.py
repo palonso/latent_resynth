@@ -5,9 +5,23 @@ from music2latent import EncoderDecoder
 from . import get_device
 
 
+def _patch_autocast_device(device: torch.device):
+    """Monkey-patch music2latent's hardcoded device_type='cuda' in torch.autocast."""
+    _original_autocast = torch.autocast
+
+    class _PatchedAutocast(_original_autocast):
+        def __init__(self, device_type, *args, **kwargs):
+            if device_type == "cuda" and not torch.cuda.is_available():
+                device_type = device.type
+            super().__init__(device_type, *args, **kwargs)
+
+    torch.autocast = _PatchedAutocast
+
+
 class Music2LatentCodec:
     def __init__(self, cfg):
         self._device = get_device()
+        _patch_autocast_device(self._device)
         self._encdec = EncoderDecoder(device=self._device)
         self._sample_rate = cfg.music2latent.sample_rate
         self._max_batch_size = cfg.music2latent.max_batch_size
